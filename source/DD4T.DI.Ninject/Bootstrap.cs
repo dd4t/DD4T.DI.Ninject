@@ -35,7 +35,7 @@ namespace DD4T.DI.Ninject
             var pageprovider = providerTypes.Where(a => typeof(IPageProvider).IsAssignableFrom(a)).FirstOrDefault();
             var cpProvider = providerTypes.Where(a => typeof(IComponentPresentationProvider).IsAssignableFrom(a)).FirstOrDefault();
             var linkProvider = providerTypes.Where(a => typeof(ILinkProvider).IsAssignableFrom(a)).FirstOrDefault();
-            var facadeProvider = providerTypes.Where(a => typeof(IProvidersCommonServices).IsAssignableFrom(a)).FirstOrDefault();
+            var commonServices = providerTypes.Where(a => typeof(IProvidersCommonServices).IsAssignableFrom(a)).FirstOrDefault();
             var binaryProvider = providerTypes.Where(a => typeof(IBinaryProvider).IsAssignableFrom(a)).FirstOrDefault();
             var componentProvider = providerTypes.Where(a => typeof(IComponentProvider).IsAssignableFrom(a)).FirstOrDefault();
 
@@ -44,7 +44,7 @@ namespace DD4T.DI.Ninject
                 kernel.Bind<IDD4TConfiguration>().To<DD4TConfiguration>().InSingletonScope();
 
             if (kernel.TryGet<ILogger>() == null)
-                kernel.Bind<ILogger>().To<NullLogger>().InSingletonScope();
+                kernel.Bind<ILogger>().To<DefaultLogger>().InSingletonScope();
 
             if (kernel.TryGet<IPublicationResolver>() == null)
                 kernel.Bind<IPublicationResolver>().To<DefaultPublicationResolver>().InSingletonScope();
@@ -65,11 +65,11 @@ namespace DD4T.DI.Ninject
             if (cpProvider != null && kernel.TryGet<IComponentPresentationProvider>() == null)
                 kernel.Bind<IComponentPresentationProvider>().To(cpProvider);
 
-            if (facadeProvider != null && kernel.TryGet<ILinkProvider>() == null)
+            if (linkProvider != null && kernel.TryGet<ILinkProvider>() == null)
                 kernel.Bind<ILinkProvider>().To(linkProvider);
 
-            if (binaryProvider != null && kernel.TryGet<IProvidersCommonServices>() == null)
-                kernel.Bind<IProvidersCommonServices>().To(facadeProvider);
+            if (commonServices != null && kernel.TryGet<IProvidersCommonServices>() == null)
+                kernel.Bind<IProvidersCommonServices>().To(commonServices);
 
             //factories
             if (kernel.TryGet<IPageFactory>() == null)
