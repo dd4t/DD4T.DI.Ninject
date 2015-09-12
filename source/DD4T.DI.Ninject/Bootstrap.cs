@@ -18,6 +18,9 @@ using DD4T.Utils.Resolver;
 using DD4T.Utils.Logging;
 using System.Reflection;
 using System.IO;
+using DD4T.Core.Contracts.ViewModels;
+using DD4T.ViewModels.Reflection;
+using DD4T.ViewModels;
 
 namespace DD4T.DI.Ninject
 {
@@ -90,6 +93,27 @@ namespace DD4T.DI.Ninject
             if (kernel.TryGet<IFactoryCommonServices>() == null)
                 kernel.Bind<IFactoryCommonServices>().To<FactoryCommonServices>();
 
+
+
+            //factories
+            if (kernel.TryGet<IReflectionHelper>() == null)
+                kernel.Bind<IReflectionHelper>().To<ReflectionOptimizer>().InSingletonScope();
+
+            if (kernel.TryGet<IViewModelResolver>() == null)
+                kernel.Bind<IViewModelResolver>().To<DefaultViewModelResolver>().InSingletonScope();
+
+            if (kernel.TryGet<IViewModelFactory>() == null)
+                kernel.Bind<IViewModelFactory>().To<ViewModelFactory>().InSingletonScope();
+
+            if (kernel.TryGet<IViewModelKeyProvider>() == null)
+                kernel.Bind<IViewModelKeyProvider>().To<WebConfigViewModelKeyProvider>().InSingletonScope();
+
+
+            //caching JMS
+            if (kernel.TryGet<IMessageProvider>() == null)
+                kernel.Bind<IMessageProvider>().To<JMSMessageProvider>().InSingletonScope();
+
+         
         }
 
     }
