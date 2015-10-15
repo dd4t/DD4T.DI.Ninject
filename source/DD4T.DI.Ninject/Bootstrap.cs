@@ -21,6 +21,7 @@ using System.IO;
 using DD4T.Core.Contracts.ViewModels;
 using DD4T.ViewModels.Reflection;
 using DD4T.ViewModels;
+using DD4T.DI.Ninject.Exceptions;
 
 namespace DD4T.DI.Ninject
 {
@@ -29,8 +30,14 @@ namespace DD4T.DI.Ninject
         public static void UseDD4T(this IKernel kernel)
         {
             //not all dll's are loaded in the app domain. we will load the assembly in the appdomain to be able map the mapping
-            var location = string.Format(@"{0}\bin\", AppDomain.CurrentDomain.BaseDirectory);
-            var file = Directory.GetFiles(location, "DD4T.Providers.*").FirstOrDefault();
+            var binDirectory = string.Format(@"{0}\bin\", AppDomain.CurrentDomain.BaseDirectory);
+            if (!Directory.Exists(binDirectory))
+                return;
+
+            var file = Directory.GetFiles(binDirectory, "DD4T.Providers.*").FirstOrDefault();
+            if (file == null)
+                throw new ProviderNotFoundException();
+
             var load = Assembly.LoadFile(file);
 
             var provider = AppDomain.CurrentDomain.GetAssemblies().Where(ass => ass.FullName.StartsWith("DD4T.Providers")).FirstOrDefault();
@@ -54,6 +61,10 @@ namespace DD4T.DI.Ninject
 
             if (kernel.TryGet<ICacheAgent>() == null)
                 kernel.Bind<ICacheAgent>().To<DefaultCacheAgent>();
+
+
+            kernel.BindMVCTypes();
+            kernel.BindRestProviderTypes();
 
             //providers
             if (binaryProvider != null && kernel.TryGet<IBinaryProvider>() == null)
