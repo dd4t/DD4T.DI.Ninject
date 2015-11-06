@@ -31,11 +31,20 @@ namespace DD4T.DI.Ninject
             var iComponentPresentationRenderer = providerTypes.Where(a => a.FullName.Equals("DD4T.Mvc.Html.IComponentPresentationRenderer")).FirstOrDefault();
             var defaultComponentPresentationRenderer = providerTypes.Where(a => a.FullName.Equals("DD4T.Mvc.Html.DefaultComponentPresentationRenderer")).FirstOrDefault();
 
-            if (iComponentPresentationRenderer == null || defaultComponentPresentationRenderer == null)
-                return;
+            var iXpmMarkupService = providerTypes.Where(a => a.FullName.Equals("DD4T.MVC.ViewModels.XPM.IXpmMarkupService")).FirstOrDefault();
+            var defaultXpmMarkupService = providerTypes.Where(a => a.FullName.Equals("DD4T.Mvc.ViewModels.XPM.XpmMarkupService")).FirstOrDefault();
 
-            if (kernel.TryGet(iComponentPresentationRenderer) == null)
-                kernel.Bind(iComponentPresentationRenderer).To(defaultComponentPresentationRenderer);
+            if (iComponentPresentationRenderer != null || defaultComponentPresentationRenderer != null)
+            {
+                if (kernel.TryGet(iComponentPresentationRenderer) == null)
+                    kernel.Bind(iComponentPresentationRenderer).To(defaultComponentPresentationRenderer);
+            }
+
+            if (iXpmMarkupService != null || defaultXpmMarkupService != null)
+            {
+                if (kernel.TryGet(iXpmMarkupService) == null)
+                    kernel.Bind(iXpmMarkupService).To(defaultXpmMarkupService);
+            }
         }
     }
 }
