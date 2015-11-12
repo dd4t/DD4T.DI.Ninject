@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace DD4T.DI.Ninject
 {
-    public static class RestProviderTypes
+    public static class RestProvider
     {
-        public static void BindRestProviderTypes(this IKernel kernel)
+        public static void BindRestProvider(this IKernel kernel)
         {
             var provider = AppDomain.CurrentDomain.GetAssemblies().Where(ass => ass.FullName.StartsWith("DD4T.Providers.Rest")).FirstOrDefault();
             if (provider == null)
