@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace DD4T.DI.Ninject
 {
-    public static class MVCTypes
+    public static class Mvc
     {
-        public static void BindMVCTypes(this IKernel kernel)
+        public static void BindMvc(this IKernel kernel)
         {
             var binDirectory = string.Format(@"{0}\bin\", AppDomain.CurrentDomain.BaseDirectory);
             if (!Directory.Exists(binDirectory))
