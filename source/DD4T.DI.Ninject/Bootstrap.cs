@@ -22,6 +22,7 @@ using DD4T.Core.Contracts.ViewModels;
 using DD4T.ViewModels.Reflection;
 using DD4T.ViewModels;
 using DD4T.DI.Ninject.Exceptions;
+using DD4T.Core.Contracts.DependencyInjection;
 
 namespace DD4T.DI.Ninject
 {
@@ -29,8 +30,54 @@ namespace DD4T.DI.Ninject
     {
         public static void UseDD4T(this IKernel kernel)
         {
-            //not all dll's are loaded in the app domain. we will load the assembly in the appdomain to be able map the mapping
             var binDirectory = string.Format(@"{0}\bin\", AppDomain.CurrentDomain.BaseDirectory);
+            //allowing to register types from any other DD4T.* package into the container: 
+            //functionality introduced to allow a more plugabble architecture into the framework.
+            var loadedAssemblies = Directory.GetFiles(binDirectory, "DD4T.*").Select(s => Assembly.LoadFile(s));
+
+            var mappers = AppDomain.CurrentDomain.GetAssemblies()
+                                   .Where(ass => ass.FullName.StartsWith("DD4T."))
+                                   .SelectMany(s => s.GetTypes())
+                                   .Where(p => typeof(IDependencyMapper).IsAssignableFrom(p) && !p.IsInterface)
+                                   .Select(o => Activator.CreateInstance(o) as IDependencyMapper).Distinct();
+
+            foreach (var mapper in mappers)
+            {
+                if (mapper.SingleInstanceMappings != null)
+                {
+                    foreach (var mapping in mapper.SingleInstanceMappings)
+                    {
+                        if (kernel.TryGet(mapping.Key) == null)
+                            kernel.Bind(mapping.Key).To(mapping.Value).InSingletonScope();
+                    }
+                }
+                if (mapper.PerDependencyMappings != null)
+                {
+                    foreach (var mapping in mapper.PerDependencyMappings)
+                    {
+                        if (kernel.TryGet(mapping.Key) == null)
+                            kernel.Bind(mapping.Key).To(mapping.Value);
+                    }
+                }
+                if (mapper.PerHttpRequestMappings != null)
+                {
+                    foreach (var mapping in mapper.PerHttpRequestMappings)
+                    {
+                        if (kernel.TryGet(mapping.Key) == null)
+                            kernel.Bind(mapping.Key).To(mapping.Value).InThreadScope();
+                    }
+                }
+                if (mapper.PerLifeTimeMappings != null)
+                {
+                    foreach (var mapping in mapper.PerLifeTimeMappings)
+                    {
+                        if (kernel.TryGet(mapping.Key) == null)
+                            kernel.Bind(mapping.Key).To(mapping.Value).InTransientScope();
+                    }
+                }
+            }
+
+            //not all dll's are loaded in the app domain. we will load the assembly in the appdomain to be able map the mapping
             if (!Directory.Exists(binDirectory))
                 return;
 
@@ -56,11 +103,6 @@ namespace DD4T.DI.Ninject
             if (kernel.TryGet<ICacheAgent>() == null)
                 kernel.Bind<ICacheAgent>().To<DefaultCacheAgent>();
 
-            //caching JMS
-            if (kernel.TryGet<IMessageProvider>() == null)
-                kernel.Bind<IMessageProvider>().To<JMSMessageProvider>().InSingletonScope();
-
-         
         }
 
     }
