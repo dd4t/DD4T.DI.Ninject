@@ -97,8 +97,6 @@ namespace DD4T.DI.Ninject
             if (kernel.TryGet<IDD4TConfiguration>() == null)
                 kernel.Bind<IDD4TConfiguration>().To<DD4TConfiguration>().InSingletonScope();
 
-            if (kernel.TryGet<ILogger>() == null)
-                kernel.Bind<ILogger>().To<DefaultLogger>().InSingletonScope();
 
             if (kernel.TryGet<ICacheAgent>() == null)
                 kernel.Bind<ICacheAgent>().To<DefaultCacheAgent>();
