@@ -12,7 +12,7 @@
     <tags>SDLTridion Tridion DD4T MVC Ninject DI DD4T.DI.Ninject SDLWeb SDL SDLWeb8</tags>
     <dependencies>
       <dependency id="Ninject" version="3.2.2.0" />
-      <dependency id="DD4T.Core" version="2.2.2" />
+      <dependency id="DD4T.Core" version="2.5" />
     </dependencies>
   </metadata>
 </package>
