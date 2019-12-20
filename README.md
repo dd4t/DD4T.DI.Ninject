@@ -7,7 +7,10 @@
 
 Ninject Dependency injection container
 
+## Release 2.5
 
+- Upgraded reference to DD4T.Core
+- Suppress warnings about obsolete methods in IComponentProvider
 
 ## How to 
 
