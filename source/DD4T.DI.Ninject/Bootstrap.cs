@@ -84,7 +84,9 @@ namespace DD4T.DI.Ninject
             if (file == null)
                 throw new ProviderNotFoundException();
 
-            var load = Assembly.LoadFile(file);
+            // do NOT load the assembly with Assembly.LoadFile, because IIS will lock the DLL
+            // See https://stackoverflow.com/questions/1031431/system-reflection-assembly-loadfile-locks-file
+            var load = Assembly.Load(System.IO.File.ReadAllBytes(file));
 
             kernel.BindProviders();
             kernel.BindFactories();
